@@ -60,6 +60,7 @@ export function sendError(res, message, statusCode = 500) {
  */
 export function sanitizeUser(user) {
   const obj = user.toObject ? user.toObject() : { ...user };
+  obj._id = obj._id?.toString() || obj.id;
   delete obj.passwordHash;
   delete obj.refreshToken;
   delete obj.__v;
