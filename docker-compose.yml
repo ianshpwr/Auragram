@@ -1,0 +1,63 @@
+version: '3.9'
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: auragram_mongo
+    restart: unless-stopped
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_DATABASE: auragram
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', 'db.adminCommand({ ping: 1 })']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  redis:
+    image: redis:7-alpine
+    container_name: auragram_redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: auragram_app
+    restart: unless-stopped
+    ports:
+      - '5000:5000'
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGO_URI: mongodb://mongo:27017/auragram
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-supersecretjwt_change_in_production}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-supersecretrefresh_change_in_production}
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-http://localhost:5173}
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+volumes:
+  mongo_data:
+  redis_data:
