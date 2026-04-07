@@ -3,14 +3,11 @@ import axios from 'axios';
 
 const axiosInstance = axios.create({
   baseURL: '/api',
-  withCredentials: true, // Send cookies with every request
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  withCredentials: true,
+  headers: { 'Content-Type': 'application/json' },
   timeout: 15000,
 });
 
-// Request interceptor
 axiosInstance.interceptors.request.use(
   (config) => config,
   (error) => Promise.reject(error)
@@ -27,44 +24,48 @@ function processQueue(error) {
   failedQueue = [];
 }
 
-// Response interceptor — handles 401 with token refresh
+// URLs that should NEVER trigger a refresh attempt
+const NO_REFRESH_URLS = ['/auth/refresh', '/auth/login', '/auth/register', '/auth/me'];
+
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const url = originalRequest.url || '';
 
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry &&
-      !originalRequest.url?.includes('/auth/refresh') &&
-      !originalRequest.url?.includes('/auth/login')
-    ) {
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
-          .then(() => axiosInstance(originalRequest))
-          .catch((err) => Promise.reject(err));
-      }
+    const shouldSkipRefresh =
+      error.response?.status !== 401 ||
+      originalRequest._retry ||
+      NO_REFRESH_URLS.some((u) => url.includes(u));
 
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      try {
-        await axiosInstance.post('/auth/refresh');
-        processQueue(null);
-        return axiosInstance(originalRequest);
-      } catch (refreshError) {
-        processQueue(refreshError);
-        // Redirect to login
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
-      }
+    if (shouldSkipRefresh) {
+      return Promise.reject(error);
     }
 
-    return Promise.reject(error);
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+      })
+        .then(() => axiosInstance(originalRequest))
+        .catch((err) => Promise.reject(err));
+    }
+
+    originalRequest._retry = true;
+    isRefreshing = true;
+
+    try {
+      await axiosInstance.post('/auth/refresh');
+      processQueue(null);
+      return axiosInstance(originalRequest);
+    } catch (refreshError) {
+      processQueue(refreshError);
+      // Fire a custom event — let React Router handle navigation,
+      // never use window.location (causes infinite reload)
+      window.dispatchEvent(new CustomEvent('auth:logout'));
+      return Promise.reject(refreshError);
+    } finally {
+      isRefreshing = false;
+    }
   }
 );
 

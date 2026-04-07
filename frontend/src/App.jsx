@@ -2,9 +2,9 @@
 // Root app with React Router v6, context providers, auth bootstrap
 
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchMe } from './store/authSlice.js';
+import { fetchMe, clearAuth } from './store/authSlice.js';
 import { SocketProvider } from './context/SocketContext.jsx';
 import { NotificationProvider } from './context/NotificationContext.jsx';
 
@@ -56,53 +56,57 @@ function LoadingScreen() {
   );
 }
 
-export function App() {
+// Inner component — lives inside BrowserRouter so useNavigate works
+function AppContent() {
   const dispatch = useDispatch();
-  const { initialized } = useSelector((s) => s.auth);
+  const navigate = useNavigate();
 
   // Bootstrap: fetch current user on mount
   useEffect(() => {
     dispatch(fetchMe());
   }, []);
 
+  // Listen for forced logout from axios interceptor (no window.location redirect)
+  useEffect(() => {
+    const handleForceLogout = () => {
+      dispatch(clearAuth());
+      navigate('/login', { replace: true });
+    };
+    window.addEventListener('auth:logout', handleForceLogout);
+    return () => window.removeEventListener('auth:logout', handleForceLogout);
+  }, [navigate]);
+
+  return (
+    <SocketProvider>
+      <NotificationProvider>
+        <div className="min-h-screen">
+          <Navbar />
+          <NotificationPanel />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/post/:id" element={<PostPage />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/profile/:id" element={<Profile />} />
+            <Route
+              path="/login"
+              element={<GuestRoute><Login /></GuestRoute>}
+            />
+            <Route
+              path="/register"
+              element={<GuestRoute><Register /></GuestRoute>}
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </div>
+      </NotificationProvider>
+    </SocketProvider>
+  );
+}
+
+export function App() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <SocketProvider>
-        <NotificationProvider>
-          <div className="min-h-screen">
-            <Navbar />
-            <NotificationPanel />
-            <Routes>
-              {/* Public routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/post/:id" element={<PostPage />} />
-              <Route path="/leaderboard" element={<Leaderboard />} />
-              <Route path="/profile/:id" element={<Profile />} />
-
-              {/* Guest-only routes */}
-              <Route
-                path="/login"
-                element={
-                  <GuestRoute>
-                    <Login />
-                  </GuestRoute>
-                }
-              />
-              <Route
-                path="/register"
-                element={
-                  <GuestRoute>
-                    <Register />
-                  </GuestRoute>
-                }
-              />
-
-              {/* Catch all */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </div>
-        </NotificationProvider>
-      </SocketProvider>
+      <AppContent />
     </BrowserRouter>
   );
 }
