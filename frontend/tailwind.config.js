@@ -51,6 +51,8 @@ export default {
         'slide-in': 'slideIn 0.3s ease-out',
         'fade-in': 'fadeIn 0.4s ease-out',
         'rank-highlight': 'rankHighlight 1.5s ease-out',
+        'text-shine': 'textShine 4s linear infinite',
+        'glaze-sweep': 'glazeSweep 4s infinite linear',
       },
       keyframes: {
         slideIn: {
