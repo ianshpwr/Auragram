@@ -61,7 +61,7 @@ export function CreatePost({ onSuccess }) {
                   : 'text-white/40 hover:text-white/70 bg-white/5'
               }`}
               style={category === cat ? {
-                background: 'linear-gradient(135deg, #7c3aed, #06b6d4)',
+                background: 'linear-gradient(135deg, #39ff14, #0cbaba)',
               } : {}}
             >
               {cat}

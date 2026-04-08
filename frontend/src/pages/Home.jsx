@@ -73,7 +73,7 @@ export function Home() {
                     : 'text-white/40 hover:text-white/70 bg-white/5'
                 }`}
                 style={(cat === 'All' && !activeCategory) || activeCategory === cat ? {
-                  background: 'linear-gradient(135deg, #7c3aed, #06b6d4)',
+                  background: 'linear-gradient(135deg, #39ff14, #0cbaba)',
                 } : {}}
               >
                 {cat}

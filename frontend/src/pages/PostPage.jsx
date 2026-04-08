@@ -93,7 +93,7 @@ export function PostPage() {
             <div key={comment._id} className="px-5 py-4">
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-                  style={{ background: 'linear-gradient(135deg, #7c3aed, #06b6d4)' }}>
+                  style={{ background: 'linear-gradient(135deg, #39ff14, #0cbaba)' }}>
                   {comment.actorId?.username?.[0]?.toUpperCase() || '?'}
                 </div>
                 <div className="flex-1 min-w-0">

@@ -30,7 +30,7 @@ export function Navbar() {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 shrink-0" id="nav-logo">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center text-lg font-black"
-            style={{ background: 'linear-gradient(135deg, #7c3aed, #06b6d4)' }}>
+            style={{ background: 'linear-gradient(135deg, #39ff14, #0cbaba)' }}>
             ✦
           </div>
           <span className="font-display font-bold text-lg text-gradient hidden sm:block">
@@ -80,7 +80,7 @@ export function Navbar() {
                   className="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-white/5 transition-all"
                 >
                   <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
-                    style={{ background: 'linear-gradient(135deg, #7c3aed, #06b6d4)' }}>
+                    style={{ background: 'linear-gradient(135deg, #39ff14, #0cbaba)' }}>
                     {user.username?.[0]?.toUpperCase()}
                   </div>
                   <span className="text-sm font-medium text-white/80 hidden sm:block">{user.username}</span>

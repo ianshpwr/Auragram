@@ -60,7 +60,7 @@ function Toast({ toast, onClose }) {
           <div className="mt-3 h-1 rounded-full overflow-hidden bg-white/10">
             <div
               className="h-full rounded-full animate-[shrink_4s_linear_forwards]"
-              style={{ background: 'linear-gradient(90deg, #7c3aed, #06b6d4)' }}
+              style={{ background: 'linear-gradient(90deg, #39ff14, #0cbaba)' }}
             />
           </div>
         )}

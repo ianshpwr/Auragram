@@ -11,7 +11,7 @@ import TierBadge from './TierBadge.jsx';
 import { formatScore, formatRank, formatDelta } from '../utils/formatScore.js';
 import { getTierColors } from '../utils/tierColors.js';
 
-function Sparkline({ history = [], color = '#7c3aed', width = 120, height = 36 }) {
+function Sparkline({ history = [], color = '#39ff14', width = 120, height = 36 }) {
   if (!history || history.length < 2) return null;
 
   const scores = history.map((h) => h.score);
