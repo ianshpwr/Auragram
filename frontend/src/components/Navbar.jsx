@@ -28,12 +28,12 @@ export function Navbar() {
       style={{ background: 'rgba(10,10,15,0.85)' }}>
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 shrink-0" id="nav-logo">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-lg font-black"
+        <Link to="/" className="flex items-center gap-2 shrink-0 group" id="nav-logo">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center text-lg font-black animate-pulse-glow"
             style={{ background: 'linear-gradient(135deg, #39ff14, #0cbaba)' }}>
             ✦
           </div>
-          <span className="font-display font-bold text-lg text-gradient hidden sm:block">
+          <span className="font-display font-bold text-lg text-gradient hidden sm:block group-hover:animate-flicker">
             AuraGram
           </span>
         </Link>

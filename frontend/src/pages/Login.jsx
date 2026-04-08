@@ -27,7 +27,7 @@ export function Login() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 animate-pulse-glow shadow-neon"
             style={{ background: 'linear-gradient(135deg, #39ff14, #0cbaba)' }}>
             <span className="text-2xl font-black text-white">✦</span>
           </div>

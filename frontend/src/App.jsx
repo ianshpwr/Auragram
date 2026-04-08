@@ -45,7 +45,7 @@ function LoadingScreen() {
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center">
         <div
-          className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-4 animate-pulse"
+          className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black mx-auto mb-4 animate-pulse-glow"
           style={{ background: 'linear-gradient(135deg, #39ff14, #0cbaba)' }}
         >
           ✦
