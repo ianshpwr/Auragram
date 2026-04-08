@@ -10,6 +10,11 @@ export async function getFeed(req, res, next) {
     const filter = { isDeleted: false, ...query };
     if (category) filter.category = category;
 
+    const posts = await Post.find(filter)
+      .sort({ _id: -1 })
+      .limit(parsedLimit + 1)
+      .populate('authorId', 'username tier auraScore category scoreHistory')
+      .lean();
 
     const hasMore = posts.length > parsedLimit;
     const items = hasMore ? posts.slice(0, -1) : posts;
