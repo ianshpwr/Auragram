@@ -20,12 +20,7 @@ export function AuraBadge({ score = 0, tier = 'Dormant', size = 'md', className 
   const circumference = 2 * Math.PI * radius;
 
   // Progress: 0-1 based on tier
-  const TIER_MAX = { Dormant: 50, Spark: 250, Rising: 800, Resonant: 2000, Influential: 5000, Luminary: 10000, Apex: 20000 };
-  const TIER_MIN = { Dormant: 0, Spark: 50, Rising: 250, Resonant: 800, Influential: 2000, Luminary: 5000, Apex: 10000 };
-  const min = TIER_MIN[tier] || 0;
-  const max = TIER_MAX[tier] || 100;
-  const progress = Math.min(1, Math.max(0, (score - min) / (max - min)));
-  const dashoffset = circumference * (1 - progress);
+
 
   const isApex = tier === 'Apex';
 
