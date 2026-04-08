@@ -134,7 +134,7 @@
   }
 
   .nav-link-active {
-    @apply nav-link text-brand-500 bg-brand-500/10 border border-brand-500/40;
+    @apply px-4 py-2 rounded-xl text-brand-500 font-medium transition-all duration-300 relative overflow-hidden bg-brand-500/10 border border-brand-500/40;
     box-shadow: inset 0 0 10px rgba(57,255,20,0.1);
     &::after {
       content: '';
