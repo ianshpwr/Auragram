@@ -29,7 +29,17 @@ export async function createAndEnqueue(eventData) {
     metadata,
   });
 
-
+  const job = await auraQueue.add(
+    'process-aura-event',
+    { eventId: event._id.toString() },
+    {
+      attempts: 3,
+      backoff: {
+        type: 'exponential',
+        delay: 1000,
+      },
+    }
+  );
 
   console.log(`[EventService] Created event ${event._id} (${type}), job ${job.id}`);
   return { event, job };
