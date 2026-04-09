@@ -22,6 +22,8 @@ export async function submitEvent(req, res, next) {
     // Extract body
     const { type: eventType, targetUserId, postId, metadata } = req.body;
 
+    // Create event and enqueue
+    const { events, job } = await createAndEnqueue({
     // Abuse protection
     const abuse = await checkAbuse({
       actorId,
@@ -42,6 +44,7 @@ export async function submitEvent(req, res, next) {
       metadata,
     });
 
+    sendSuccess(res, { eventId: events._id, jobId: job.id }, 202);
     // Success response
     return sendSuccess(res, {
       message: 'Event accepted for processing',
