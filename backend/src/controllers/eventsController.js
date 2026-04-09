@@ -17,7 +17,7 @@ export async function submitEvent(req, res, next) {
     if (!abuse.allowed) return sendError(res, abuse.reason, 429);
 
     // Create event and enqueue
-    const { event, job } = await createAndEnqueue({
+    const { events, job } = await createAndEnqueue({
       actorId,
       targetUserId,
       postId,
@@ -25,7 +25,7 @@ export async function submitEvent(req, res, next) {
       metadata,
     });
 
-    sendSuccess(res, { eventId: event._id, jobId: job.id }, 202);
+    sendSuccess(res, { eventId: events._id, jobId: job.id }, 202);
   } catch (err) {
     next(err);
   }
