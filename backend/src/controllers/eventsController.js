@@ -1,10 +1,28 @@
 // src/controllers/eventsController.js
+// Event submission and processing endpoints
+//
+// Handles client-side event submissions with:
+// - Input validation using express-validator
+// - Abuse detection and prevention checks
+// - Asynchronous event queueing via BullMQ
+// - HTTP 202 responses indicating accepted for processing
 
 import { validationResult } from 'express-validator';
 import { checkAbuse } from '../services/abuseGuard.js';
 import { createAndEnqueue } from '../services/eventService.js';
 import { sendSuccess, sendError } from '../utils/helpers.js';
 
+/**
+ * Submit an event for aura score processing.
+ * Client-facing endpoint that validates, checks abuse, and queues the event.
+ * Returns 202 Accepted to indicate asynchronous processing.
+ * 
+ * Flow:
+ * 1. Validate request parameters
+ * 2. Check abuse signals (velocity, rate limits, self-engagement)
+ * 3. Create Event document and enqueue job
+ * 4. Return job ID for status tracking
+ */
 export async function submitEvent(req, res, next) {
   try {
     // Validate request
@@ -22,9 +40,7 @@ export async function submitEvent(req, res, next) {
     // Extract body
     const { type: eventType, targetUserId, postId, metadata } = req.body;
 
-    // Create event and enqueue
-    const { events, job } = await createAndEnqueue({
-    // Abuse protection
+    // Abuse protection — check for suspicious patterns
     const abuse = await checkAbuse({
       actorId,
       targetUserId,
@@ -44,7 +60,6 @@ export async function submitEvent(req, res, next) {
       metadata,
     });
 
-    sendSuccess(res, { eventId: events._id, jobId: job.id }, 202);
     // Success response
     return sendSuccess(res, {
       message: 'Event accepted for processing',
