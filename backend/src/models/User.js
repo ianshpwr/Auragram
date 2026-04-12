@@ -1,7 +1,19 @@
 // src/models/User.js
+// User schema and model
+//
+// Represents a user account with:
+// - Authentication credentials (username, email, password hash)
+// - Aura score for competitive ranking
+// - Tier badges based on score milestones
+// - Activity tracking (lastActiveAt)
+// - Account status (ban flags, suspension times)
+// - Score history for analytics and charts
+// - Category specialization for topic-focused leaderboards
+
 import mongoose from 'mongoose';
 import { TIERS } from '../utils/constants.js';
 
+// Track historical aura scores for visualization and analytics
 const scoreHistorySchema = new mongoose.Schema(
   {
     score: { type: Number, required: true },
