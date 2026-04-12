@@ -1,5 +1,12 @@
 // src/middlewares/auth.js
 // JWT authentication middleware with silent refresh support
+//
+// Provides:
+// - Access token validation from httpOnly cookies
+// - Silent token refresh using refresh tokens
+// - User ban checking for account suspension
+// - Session management with automatic re-authentication
+// - Security headers for XSS protection
 
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
@@ -8,7 +15,14 @@ import { sendError } from '../utils/helpers.js';
 
 /**
  * Verify access token from httpOnly cookie.
- * Silently refreshes if the token is expired but refresh token is valid.
+ * Implements silent refresh: if access token expired but refresh token valid,
+ * automatically issue new tokens and continue without client-side intervention.
+ * 
+ * Checks:
+ * - Access token presence and validity
+ * - User exists and is not banned
+ * - Refresh token validity on access token expiry
+ * - Ban expiration times to lift temporary suspensions
  */
 export async function authenticate(req, res, next) {
   try {
