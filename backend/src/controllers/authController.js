@@ -1,4 +1,13 @@
 // src/controllers/authController.js
+// Authentication controller — handles user registration, login, and token management
+//
+// This module manages:
+// - User registration with password hashing and validation
+// - User login with JWT token generation
+// - Token refresh mechanism for session management
+// - Logout functionality with token invalidation
+// - Secure cookie-based token storage
+
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
@@ -7,6 +16,10 @@ import env from '../config/env.js';
 import { sanitizeUser, sendSuccess, sendError } from '../utils/helpers.js';
 import redisClient from '../config/redis.js';
 
+/**
+ * Set secure HTTP-only cookies for access and refresh tokens.
+ * Helps prevent XSS attacks by making tokens inaccessible to JavaScript.
+ */
 function setTokenCookies(res, accessToken, refreshToken) {
   res.cookie('accessToken', accessToken, {
     httpOnly: true,
@@ -24,15 +37,21 @@ function setTokenCookies(res, accessToken, refreshToken) {
 }
 
 function issueTokens(userId) {
+  // Create short-lived access token for API requests
   const accessToken = jwt.sign({ userId }, env.JWT_SECRET, {
     expiresIn: env.JWT_ACCESS_EXPIRES_IN,
   });
+  // Create long-lived refresh token for obtaining new access tokens
   const refreshToken = jwt.sign({ userId }, env.JWT_REFRESH_SECRET, {
     expiresIn: env.JWT_REFRESH_EXPIRES_IN,
   });
   return { accessToken, refreshToken };
 }
 
+/**
+ * Register a new user account.
+ * Validates input, checks for existing email/username, hashes password, and creates user record.
+ */
 export async function register(req, res, next) {
   try {
     const errors = validationResult(req);
