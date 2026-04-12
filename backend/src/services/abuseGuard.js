@@ -1,5 +1,12 @@
 // src/services/abuseGuard.js
-// Anti-abuse checks for all event submissions
+// Anti-abuse detection and prevention system
+//
+// Implements multi-layered abuse prevention:
+// - Self-engagement detection: prevents users from artificially boosting their own score
+// - Velocity anomaly detection: catches bot-like behavior with high-frequency events
+// - Rate limiting: enforces per-action limits to prevent spam
+// - Automatic soft-banning: temporarily suspends suspicious accounts
+// - Development bypass: disables checks in development for testing
 
 import redisClient from '../config/redis.js';
 import Event from '../models/Event.js';
@@ -8,11 +15,14 @@ import { RATE_LIMITS, RATE_LIMIT_WINDOW, VELOCITY_LIMIT, BAN_DURATION } from '..
 
 /**
  * Run all abuse checks for an incoming event.
- * @param {Object} params
+ * Implements defense-in-depth approach with multiple validation layers.
+ * All checks are performed in sequence; first failure aborts the action.
+ * 
+ * @param {Object} params - Abuse check parameters
  * @param {string} params.actorId - The user performing the action
  * @param {string} params.targetUserId - The user being acted upon
- * @param {string} params.action - The event type
- * @returns {Promise<{ allowed: boolean, reason: string }>}
+ * @param {string} params.action - The event type for rate limit lookup
+ * @returns {Promise<{ allowed: boolean, reason: string }>} - Check result with reason
  */
 export async function checkAbuse({ actorId, targetUserId, action }) {
   // In development, skip all abuse checks
