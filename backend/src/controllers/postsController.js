@@ -1,4 +1,12 @@
 // src/controllers/postsController.js
+// Post management controller — handles creation, retrieval, and engagement with posts
+// 
+// This module manages all post-related operations including:
+// - Creating new posts and triggering aura score updates
+// - Retrieving posts with cursor-based pagination
+// - Handling post engagements (likes, comments, shares)
+// - Abuse detection and prevention
+
 import { validationResult } from 'express-validator';
 import Post from '../models/Post.js';
 import redisClient from '../config/redis.js';
@@ -7,6 +15,10 @@ import { checkAbuse } from '../services/abuseGuard.js';
 import { sendSuccess, sendError, buildCursorQuery, encodeCursor } from '../utils/helpers.js';
 import { CACHE_TTL } from '../utils/constants.js';
 
+/**
+ * Create a new post and enqueue event for aura score calculation.
+ * Validates input and triggers the event system to award points to the author.
+ */
 export async function createPost(req, res, next) {
   try {
     const errors = validationResult(req);
