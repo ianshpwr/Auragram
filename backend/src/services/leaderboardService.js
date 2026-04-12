@@ -1,5 +1,9 @@
 // src/services/leaderboardService.js
 // Leaderboard queries from Redis ZSET with MongoDB hydration
+//
+// This service manages leaderboard rankings by querying Redis sorted sets for fast access
+// and hydrating results with full user data from MongoDB. Implements caching strategies
+// to minimize database load while keeping rankings up-to-date in real-time.
 
 import redisClient from '../config/redis.js';
 import User from '../models/User.js';
@@ -7,8 +11,11 @@ import { CACHE_TTL } from '../utils/constants.js';
 
 /**
  * Get top N users from global leaderboard.
+ * Uses Redis cache with fallback to ZSET queries and MongoDB hydration.
+ * Cache expires based on LEADERBOARD TTL to balance freshness and performance.
+ * 
  * @param {number} limit - Max users to return (default 100)
- * @returns {Promise<Array>}
+ * @returns {Promise<Array>} - Array of user objects with rank and score
  */
 export async function getGlobal(limit = 100) {
   const cacheKey = 'cache:leaderboard:global:top100';
@@ -34,9 +41,12 @@ export async function getGlobal(limit = 100) {
 
 /**
  * Get top N users from a category leaderboard.
- * @param {string} category
- * @param {number} limit
- * @returns {Promise<Array>}
+ * Retrieves rankings for specific topics (tech, art, gaming, etc.)
+ * enabling category-specific leaderboards and engagement metrics.
+ * 
+ * @param {string} category - Category name (e.g., 'tech', 'art', 'gaming')
+ * @param {number} limit - Max users to return
+ * @returns {Promise<Array>} - Top users in the category
  */
 export async function getByCategory(category, limit = 100) {
   const entries = await redisClient.zrevrange(`leaderboard:${category}`, 0, limit - 1, 'WITHSCORES');
@@ -45,7 +55,10 @@ export async function getByCategory(category, limit = 100) {
 
 /**
  * Get a user's rank in the global leaderboard.
- * @param {string} userId
+ * Useful for individual user rank display and competitive context.
+ * 1-based ranking (rank 1 is the top user).
+ * 
+ * @param {string} userId - The MongoDB user ID
  * @returns {Promise<number|null>} - 1-based rank or null if not ranked
  */
 export async function getUserRank(userId) {
