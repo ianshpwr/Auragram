@@ -1,5 +1,9 @@
 // src/services/auraEngine.js
 // Core aura score computation engine — deterministic math only
+//
+// This module handles all aura score calculations and updates. It applies
+// event-based deltas, quality multipliers for engagement, and time-based decay.
+// All operations are transactional and logged for audit purposes.
 
 import mongoose from 'mongoose';
 import User from '../models/User.js';
@@ -13,6 +17,9 @@ import { emitToUser } from '../socket/socketManager.js';
 
 /**
  * Compute a quality multiplier based on post engagement totals.
+ * Posts with more engagement (likes, comments, shares) receive higher multipliers
+ * to incentivize creation of valuable community content.
+ * 
  * @param {Object} post - Mongoose Post document
  * @returns {number} - Multiplier between 1.0 and 2.0
  */
@@ -29,6 +36,9 @@ function qualityMultiplier(post) {
 
 /**
  * Apply time-based score decay for inactive users.
+ * Users who don't engage with the platform lose aura points gradually
+ * to encourage consistent participation and keep the leaderboard dynamic.
+ * 
  * @param {Object} user - Mongoose User document
  * @returns {number} - Decayed score
  */
@@ -42,6 +52,8 @@ export function decayScore(user) {
 /**
  * Main event processing function.
  * Called by the BullMQ worker for each queued event.
+ * Handles transactional updates to ensure data consistency and logs all changes.
+ * 
  * @param {Object} eventDoc - Mongoose Event document
  */
 export async function processEvent(eventDoc) {
