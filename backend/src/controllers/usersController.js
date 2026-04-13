@@ -47,6 +47,7 @@ export async function getUserPosts(req, res, next) {
     // Retrieve user's posts with cursor-based pagination
     // Excludes deleted posts and sorts by creation date (newest first)
     const { cursor, limit } = req.query;
+    const { id } = req.params;
     const { query, limit: parsedLimit } = buildCursorQuery(cursor, limit);
 
     const posts = await Post.find({
