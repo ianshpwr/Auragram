@@ -16,7 +16,6 @@ import { sendSuccess, buildCursorQuery, encodeCursor } from '../utils/helpers.js
  * Optionally filters by category.
  * Excludes deleted posts and populates author data.
  */
-// async function
 export async function getFeed(req, res, next) {
   try {
     const { cursor, limit, category } = req.query;
