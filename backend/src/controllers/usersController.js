@@ -77,6 +77,7 @@ export async function updateMe(req, res, next) {
 
     // Allow authenticated user to update their profile info
     // Currently supports username and category changes
+    const { username, category } = req.body;
     const updates = {};
     if (username) updates.username = username;
     if (category) updates.category = category;
