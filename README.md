@@ -18,7 +18,7 @@ With features like dynamic tier assignments, abuse-guard algorithms, score decay
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Backend
 *   **Runtime & Framework**: Node.js, Express.js
@@ -148,7 +148,7 @@ When a user takes an action (e.g., likes a post):
 
 ---
 
-## 📝 Scripts
+## Scripts
 
 *   `backend/npm run start`: Starts the application in production mode.
 *   `backend/npm run dev`: Starts the application logic using nodemon for hot-reloading.
