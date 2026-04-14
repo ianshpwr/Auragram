@@ -1,4 +1,4 @@
-# 🌟 AuraGram
+# AuraGram
 
 AuraGram is a full-stack, realtime social media platform built around an interactive "Aura" scoring system. Every engagement—likes, comments, shares, etc.—impacts a user's Aura score, which is calculated in real-time by a robust background engine.
 
@@ -6,7 +6,7 @@ With features like dynamic tier assignments, abuse-guard algorithms, score decay
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
 *   **Dynamic Aura Engine**: Centralized scoring system that evaluates user actions with configurable event weights and quality multipliers.
 *   **Real-time Updates**: Live score changes, tier updates, and leaderboard rankings powered by Socket.io.
@@ -40,7 +40,7 @@ With features like dynamic tier assignments, abuse-guard algorithms, score decay
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 Auragram/
@@ -79,7 +79,7 @@ Auragram/
 
 ---
 
-## 🚦 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -135,7 +135,7 @@ npm run seed
 
 ---
 
-## 🏗️ Architecture Design Highlights
+## Architecture Design Highlights
 
 ### The Aura Event Pipeline
 When a user takes an action (e.g., likes a post):
@@ -161,8 +161,8 @@ When a user takes an action (e.g., likes a post):
 _AuraGram was built to power rich, immersive, and competitive social networking._
 
 Team Members:
-Ansh Pawar
-Niharika Choudhary
-Gauri Mehrotra 
-Kush Puri
+Ansh Pawar, 
+Niharika Choudhary, 
+Gauri Mehrotra, 
+Kush Puri, 
 Aadit Vachher
