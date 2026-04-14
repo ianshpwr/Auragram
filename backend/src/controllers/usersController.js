@@ -1,4 +1,13 @@
 // src/controllers/usersController.js
+// User management and profile endpoints
+//
+// Handles all user-related operations including:
+// - Profile retrieval with rank and aura score
+// - User post history with cursor pagination
+// - Profile updates with cache invalidation
+// - Aura score transaction logs for user insights
+// - Implements caching strategies for frequently accessed profiles
+
 import { validationResult } from 'express-validator';
 import User from '../models/User.js';
 import Post from '../models/Post.js';
@@ -7,6 +16,11 @@ import redisClient from '../config/redis.js';
 import { sanitizeUser, sendSuccess, sendError, buildCursorQuery, encodeCursor } from '../utils/helpers.js';
 import { getUserRank } from '../services/leaderboardService.js';
 
+/**
+ * Get user profile by ID with global rank.
+ * Retrieves full user data with caching to reduce database load.
+ * Includes global leaderboard rank for competitive context.
+ */
 export async function getUserById(req, res, next) {
   try {
     const { id } = req.params;
@@ -30,8 +44,10 @@ export async function getUserById(req, res, next) {
 
 export async function getUserPosts(req, res, next) {
   try {
-    const { id } = req.params;
+    // Retrieve user's posts with cursor-based pagination
+    // Excludes deleted posts and sorts by creation date (newest first)
     const { cursor, limit } = req.query;
+    const { id } = req.params;
     const { query, limit: parsedLimit } = buildCursorQuery(cursor, limit);
 
     const posts = await Post.find({
@@ -59,6 +75,8 @@ export async function updateMe(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ success: false, errors: errors.array() });
 
+    // Allow authenticated user to update their profile info
+    // Currently supports username and category changes
     const { username, category } = req.body;
     const updates = {};
     if (username) updates.username = username;

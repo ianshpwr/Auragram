@@ -1,7 +1,19 @@
 // src/models/Post.js
+// Post schema and model
+//
+// Represents user-generated content with:
+// - Author reference with automatic deletion cascade
+// - Text content with length limits
+// - Category-based organization (tech, art, gaming, etc.)
+// - Engagement metrics (likes, comments, shares, bookmarks)
+// - Aura impact scoring for quality assessment
+// - Soft delete support (isDeleted flag)
+// - Timestamps for sorting and activity tracking
+
 import mongoose from 'mongoose';
 import { CATEGORIES } from '../utils/constants.js';
 
+// Nested schema for tracking engagement metrics
 const engagementsSchema = new mongoose.Schema(
   {
     likes: { type: Number, default: 0 },

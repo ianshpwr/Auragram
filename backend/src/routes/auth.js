@@ -1,4 +1,13 @@
 // src/routes/auth.js
+// Authentication API routes
+//
+// Endpoints:
+// - POST /register — Create new user account with validation
+// - POST /login — Authenticate user and issue JWT tokens
+// - POST /logout — Clear authentication cookies
+// - POST /refresh — Get new access token using refresh token
+// - GET /me — Get authenticated user profile
+
 import { Router } from 'express';
 import { body } from 'express-validator';
 import { register, login, logout, refresh, getMe } from '../controllers/authController.js';
@@ -6,6 +15,7 @@ import authenticate from '../middlewares/auth.js';
 
 const router = Router();
 
+// User registration with input validation
 router.post(
   '/register',
   [

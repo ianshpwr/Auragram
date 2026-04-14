@@ -1,7 +1,18 @@
 // src/models/Event.js
-// Immutable event record
+// Immutable event record for aura score computation
+//
+// Event log captures all user actions for:
+// - Aura score calculation by the BullMQ worker
+// - Audit trails for transparency and debugging
+// - Abuse pattern detection
+// - Analytics and engagement metrics
+// - Replay capability for recalculation
+//
+// Never modified after creation; immutable by design for data integrity
+
 import mongoose from 'mongoose';
 
+// Complete list of event types triggering aura calculations
 const EVENT_TYPES = [
   'post_created',
   'post_liked',

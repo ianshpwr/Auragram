@@ -1,4 +1,17 @@
 // src/routes/posts.js
+// Post management API routes
+//
+// Endpoints:
+// - GET / — Get paginated feed with cursor pagination
+// - GET /:id — Get single post by ID
+// - POST / — Create new post (authenticated)
+// - DELETE /:id — Delete post (authenticated)
+// - POST /:id/like — Like a post (authenticated)
+// - POST /:id/comment — Add comment to post (authenticated)
+// - POST /:id/share — Share a post (authenticated)
+// - POST /:id/bookmark — Bookmark a post (authenticated)
+// - POST /:id/report — Report post for abuse (authenticated)
+
 import { Router } from 'express';
 import { body } from 'express-validator';
 import authenticate from '../middlewares/auth.js';
@@ -9,7 +22,7 @@ import {
 
 const router = Router();
 
-router.get('/', getFeed);
+// Public feed browsing with cursor pagination
 router.get('/:id', getPostById);
 router.get('/:id/comments', getComments);
 

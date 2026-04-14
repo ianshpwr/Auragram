@@ -1,5 +1,12 @@
 // src/socket/socketManager.js
-// Socket.io management with JWT auth and room handling
+// Socket.io real-time communication with JWT authentication
+//
+// Manages WebSocket connections for:
+// - Real-time notifications (aura score updates, leaderboard changes)
+// - User presence and online status tracking
+// - Bidirectional event broadcasting
+// - JWT authentication on connection
+// - Per-user room isolation for targeted messaging
 
 import jwt from 'jsonwebtoken';
 import env from '../config/env.js';
@@ -8,7 +15,9 @@ let io = null;
 
 /**
  * Initialize the socket manager with an io instance.
- * @param {import('socket.io').Server} ioInstance
+ * Sets up authentication middleware and connection handlers.
+ * 
+ * @param {import('socket.io').Server} ioInstance - Socket.io server instance
  */
 export function initSocket(ioInstance) {
   io = ioInstance;

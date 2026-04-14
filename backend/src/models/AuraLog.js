@@ -1,7 +1,16 @@
 // src/models/AuraLog.js
 // Audit trail for all aura score changes
+//
+// Maintains complete history of aura score modifications:
+// - Records before/after scores for verification
+// - Links to originating events for traceability
+// - Provides transparency to users about score changes
+// - Enables score audit and recalculation verification
+// - Powers user-facing transaction history/logs
+
 import mongoose from 'mongoose';
 
+// Schema for logging every single aura score change
 const auraLogSchema = new mongoose.Schema(
   {
     userId: {

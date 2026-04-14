@@ -1,12 +1,20 @@
 // src/utils/helpers.js
 // Pagination helpers and response formatters
+//
+// Provides utility functions for:
+// - Cursor-based pagination using MongoDB ObjectIds
+// - Standard API response formatting (success/error)
+// - User data sanitization to prevent sensitive leaks
+// - Cursor encoding/decoding using base64
 
 /**
  * Build cursor-based pagination query.
- * Cursor is the _id of the last document seen.
+ * Cursor is the _id of the last document seen, encoded in base64.
+ * Supports infinite scrolling with efficient database queries.
+ * 
  * @param {string} cursor - Last document ID (base64 encoded)
- * @param {number} limit
- * @returns {{ query: Object, limit: number }}
+ * @param {number} limit - Results per page (max 100)
+ * @returns {{ query: Object, limit: number }} - MongoDB query and parsed limit
  */
 export function buildCursorQuery(cursor, limit = 20) {
   const parsedLimit = Math.min(parseInt(limit, 10) || 20, 100);

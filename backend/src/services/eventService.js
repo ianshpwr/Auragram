@@ -1,5 +1,11 @@
 // src/services/eventService.js
-// Creates Event documents and enqueues them into BullMQ
+// Event creation and BullMQ queue management
+//
+// This service is the backbone of the aura system. It:
+// - Creates immutable Event documents for audit trails
+// - Enqueues events into BullMQ for asynchronous processing
+// - Implements retry logic with exponential backoff for reliability
+// - Logs all events for monitoring and debugging
 
 import Event from '../models/Event.js';
 import { auraQueue } from '../config/queue.js';
@@ -7,12 +13,20 @@ import { EVENT_WEIGHTS } from '../utils/constants.js';
 
 /**
  * Create an Event document and enqueue it for async processing.
- * @param {Object} eventData
- * @param {string} eventData.actorId
- * @param {string} [eventData.targetUserId]
- * @param {string} [eventData.postId]
- * @param {string} eventData.type
- * @returns {Promise<{ event: Object, job: Object }>}
+ * This is the main entry point for all aura-scoring events in the system.
+ * Events are processed asynchronously by the auraWorker to avoid blocking API responses.
+ * 
+ * Retry Strategy:
+ * - 3 attempts per job with exponential backoff (1s, 2s, 4s)
+ * - Ensures reliability even with temporary database or Redis issues
+ * 
+ * @param {Object} eventData - Event creation parameters
+ * @param {string} eventData.actorId - User performing the action
+ * @param {string} [eventData.targetUserId] - User being acted upon (e.g., post author)
+ * @param {string} [eventData.postId] - Related post ID if applicable
+ * @param {string} eventData.type - Event type from EVENT_WEIGHTS constants
+ * @param {Object} [eventData.metadata] - Additional context-specific data
+ * @returns {Promise<{ event: Object, job: Object }>} - Created event and job objects
  */
 export async function createAndEnqueue(eventData) {
   const { actorId, targetUserId, postId, type, metadata = {} } = eventData;

@@ -1,7 +1,21 @@
 // src/controllers/feedController.js
+// Feed endpoints for browsing posts
+//
+// Provides paginated feed of posts with support for:
+// - Cursor-based pagination for scalability
+// - Category filtering for topic-specific feeds
+// - User context enrichment with author aura score and tier
+// - Efficient querying with lean() for performance
+
 import Post from '../models/Post.js';
 import { sendSuccess, buildCursorQuery, encodeCursor } from '../utils/helpers.js';
 
+/**
+ * Get paginated feed of posts.
+ * Implements cursor-based pagination for infinite scrolling.
+ * Optionally filters by category.
+ * Excludes deleted posts and populates author data.
+ */
 export async function getFeed(req, res, next) {
   try {
     const { cursor, limit, category } = req.query;
