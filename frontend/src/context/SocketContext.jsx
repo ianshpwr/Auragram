@@ -26,16 +26,14 @@ export function SocketProvider({ children }) {
       return;
     }
 
-    // Dev: connect directly to backend (Vite proxy doesn't reliably handle WebSocket upgrades)
-    // Prod: connect to the Render backend URL derived from VITE_API_URL
+    // Dev: connect to local backend directly (Vite can't reliably proxy WebSocket upgrades)
+    // Prod: connect directly to Render backend (Vercel proxy can't handle WebSocket upgrades either)
     let SOCKET_URL;
     if (import.meta.env.DEV) {
       SOCKET_URL = 'http://localhost:5001';
-    } else if (import.meta.env.VITE_API_URL) {
-      // Strip /api suffix to get the socket host: e.g. https://auragram-backend.onrender.com
-      SOCKET_URL = import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '');
     } else {
-      SOCKET_URL = '/';
+      // VITE_SOCKET_URL is baked in at build time from .env.production
+      SOCKET_URL = import.meta.env.VITE_SOCKET_URL || '/';
     }
 
     // Only send real JWT tokens; 'cookie' is our sentinel for cookie-based sessions

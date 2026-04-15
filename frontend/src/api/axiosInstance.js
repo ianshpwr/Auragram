@@ -1,13 +1,14 @@
 // src/api/axiosInstance.js
+//
+// In production (Vercel): requests go to /api, which vercel.json proxies
+//   to https://auragram.onrender.com/api — same-origin from browser perspective.
+// In development: /api is proxied by Vite to localhost:5001.
+// No VITE_API_URL needed.
+
 import axios from 'axios';
 
-// In production (Vercel), requests go to /api which Vercel rewrites to Render backend.
-// In development, requests go to /api which Vite proxies to localhost:5001.
-// VITE_API_URL can override both if set explicitly in .env.production.
-const BASE_URL = import.meta.env.VITE_API_URL || '/api';
-
 const axiosInstance = axios.create({
-  baseURL: BASE_URL,
+  baseURL: '/api',
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
   timeout: 15000,
@@ -36,7 +37,7 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    // If config is missing (network error, timeout) bail early
+    // Guard: config can be undefined on network errors / timeouts
     if (!originalRequest) return Promise.reject(error);
 
     const url = originalRequest.url || '';
