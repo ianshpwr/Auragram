@@ -70,8 +70,8 @@ const authSlice = createSlice({
       .addCase(loginUser.pending, (state) => { state.loading = true; state.error = null; })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
-        state.accessToken = action.payload.accessToken;
+        state.user = action.payload?.user ?? null;
+        state.accessToken = action.payload?.accessToken ?? null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -80,8 +80,8 @@ const authSlice = createSlice({
       .addCase(registerUser.pending, (state) => { state.loading = true; state.error = null; })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
-        state.accessToken = action.payload.accessToken;
+        state.user = action.payload?.user ?? null;
+        state.accessToken = action.payload?.accessToken ?? null;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
@@ -93,10 +93,15 @@ const authSlice = createSlice({
         state.initialized = true;
       })
       .addCase(fetchMe.fulfilled, (state, action) => {
-        state.user = action.payload;
+        // Backend /auth/me returns the user object directly (not wrapped in {user})
+        state.user = action.payload ?? null;
+        // accessToken is cookie-based; mark as 'cookie' so SocketContext knows we're authed
+        if (action.payload) state.accessToken = 'cookie';
         state.initialized = true;
       })
       .addCase(fetchMe.rejected, (state) => {
+        state.user = null;
+        state.accessToken = null;
         state.initialized = true;
       });
   },

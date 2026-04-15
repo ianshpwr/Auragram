@@ -15,7 +15,9 @@ export function SocketProvider({ children }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!user || !accessToken) {
+    // Gate on user only — auth is cookie-based, accessToken in Redux is only
+    // present immediately after login/register (or set to 'cookie' after fetchMe)
+    if (!user) {
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -24,12 +26,24 @@ export function SocketProvider({ children }) {
       return;
     }
 
-    // In dev, connect directly to backend — Vite proxy doesn't reliably upgrade WebSocket
-    const SOCKET_URL = import.meta.env.DEV ? 'http://localhost:5001' : '/';
+    // Dev: connect directly to backend (Vite proxy doesn't reliably handle WebSocket upgrades)
+    // Prod: connect to the Render backend URL derived from VITE_API_URL
+    let SOCKET_URL;
+    if (import.meta.env.DEV) {
+      SOCKET_URL = 'http://localhost:5001';
+    } else if (import.meta.env.VITE_API_URL) {
+      // Strip /api suffix to get the socket host: e.g. https://auragram-backend.onrender.com
+      SOCKET_URL = import.meta.env.VITE_API_URL.replace(/\/api\/?$/, '');
+    } else {
+      SOCKET_URL = '/';
+    }
+
+    // Only send real JWT tokens; 'cookie' is our sentinel for cookie-based sessions
+    const authToken = accessToken && accessToken !== 'cookie' ? accessToken : undefined;
 
     const socket = io(SOCKET_URL, {
       withCredentials: true,
-      auth: { token: accessToken },
+      ...(authToken ? { auth: { token: authToken } } : {}),
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,
@@ -91,7 +105,7 @@ export function SocketProvider({ children }) {
       socket.disconnect();
       socketRef.current = null;
     };
-  }, [user?._id, accessToken]);
+  }, [user?._id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const joinLeaderboard = () => socketRef.current?.emit('join_leaderboard');
   const leaveLeaderboard = () => socketRef.current?.emit('leave_leaderboard');

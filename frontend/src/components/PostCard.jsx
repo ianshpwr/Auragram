@@ -38,10 +38,15 @@ function EngagementButton({ icon, count, active, onClick, loading, color = 'rgba
 
 export function PostCard({ post, showCommentInput = false }) {
   const user = useSelector((s) => s.auth.user);
-  const author = post.authorId;
+  // authorId may be a populated object OR a raw ObjectId string (cache miss / raw create)
+  const author = post.authorId && typeof post.authorId === 'object' ? post.authorId : null;
   const colors = getTierColors(author?.tier);
 
-  const [engagements, setEngagements] = useState(post.engagements || {});
+  const [engagements, setEngagements] = useState(
+    typeof post.engagements === 'object' && post.engagements !== null
+      ? post.engagements
+      : { likes: 0, comments: 0, shares: 0, bookmarks: 0 }
+  );
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [commentOpen, setCommentOpen] = useState(showCommentInput);

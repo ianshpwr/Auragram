@@ -8,21 +8,21 @@ import PostCard from './PostCard.jsx';
 
 export function Feed({ category }) {
   const dispatch = useDispatch();
-  const { posts, nextCursor, hasMore, loading } = useSelector((s) => s.feed);
+  const { posts, nextCursor, hasMore, loading, error } = useSelector((s) => s.feed);
   const observerRef = useRef(null);
   const sentinelRef = useRef(null);
 
-  // Initial load
+  // Initial load + category change — reset feed
   useEffect(() => {
     dispatch(fetchFeed({ category }));
-  }, [category]);
+  }, [category]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Infinite scroll observer
   const loadMore = useCallback(() => {
     if (!loading && hasMore && nextCursor) {
       dispatch(fetchFeed({ cursor: nextCursor, category }));
     }
-  }, [loading, hasMore, nextCursor, category]);
+  }, [loading, hasMore, nextCursor, category]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!sentinelRef.current) return;
@@ -36,9 +36,26 @@ export function Feed({ category }) {
     return () => observerRef.current?.disconnect();
   }, [loadMore]);
 
+  // Render safe posts — always an array (feedSlice guarantees this, but double-guard here)
+  const safePosts = Array.isArray(posts) ? posts : [];
+
   return (
     <div className="space-y-4">
-      {posts.map((post) => (
+      {/* Error state — never show a blank screen on failure */}
+      {error && safePosts.length === 0 && !loading && (
+        <div className="card p-8 text-center">
+          <p className="text-4xl mb-3">⚠️</p>
+          <p className="text-white/50 text-sm mb-4">{error}</p>
+          <button
+            onClick={() => dispatch(fetchFeed({ category }))}
+            className="btn-secondary text-sm"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
+      {safePosts.map((post) => (
         <PostCard key={post._id} post={post} />
       ))}
 
@@ -66,13 +83,13 @@ export function Feed({ category }) {
         </div>
       )}
 
-      {!hasMore && posts.length > 0 && (
+      {!hasMore && safePosts.length > 0 && (
         <div className="text-center py-8 text-white/20 text-sm">
           You've reached the end ✦
         </div>
       )}
 
-      {!loading && posts.length === 0 && (
+      {!loading && safePosts.length === 0 && !error && (
         <div className="text-center py-16">
           <p className="text-5xl mb-4">✦</p>
           <p className="text-white/40">No posts yet. Be the first to share!</p>

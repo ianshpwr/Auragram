@@ -35,10 +35,22 @@ validateEnv();
 const app = express();
 const httpServer = createServer(app);
 
+// Support comma-separated origins e.g. "https://auragram.vercel.app,http://localhost:5173"
+const allowedOrigins = env.CLIENT_ORIGIN
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+const corsOriginFn = (origin, callback) => {
+  // Allow requests with no origin (curl, same-origin, health checks)
+  if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+  callback(new Error(`CORS: origin ${origin} not allowed`));
+};
+
 // Socket.io
 const io = new Server(httpServer, {
   cors: {
-    origin: env.CLIENT_ORIGIN,
+    origin: corsOriginFn,
     methods: ['GET', 'POST'],
     credentials: true,
   },
@@ -55,7 +67,7 @@ app.use(helmet({
 }));
 
 app.use(cors({
-  origin: env.CLIENT_ORIGIN,
+  origin: corsOriginFn,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],

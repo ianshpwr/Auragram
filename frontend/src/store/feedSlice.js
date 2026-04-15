@@ -35,7 +35,7 @@ const feedSlice = createSlice({
       .addCase(fetchFeed.pending, (state) => { state.loading = true; state.error = null; })
       .addCase(fetchFeed.fulfilled, (state, action) => {
         state.loading = false;
-        const { posts, nextCursor, hasMore, fresh } = action.payload;
+        const { posts = [], nextCursor = null, hasMore = false, fresh } = action.payload || {};
         state.posts = fresh ? posts : [...state.posts, ...posts];
         state.nextCursor = nextCursor;
         state.hasMore = hasMore;

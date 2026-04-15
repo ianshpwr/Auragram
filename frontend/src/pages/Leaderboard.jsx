@@ -12,7 +12,7 @@ export function Leaderboard() {
   const [activeCategory, setActiveCategory] = useState(null);
   const { global: globalBoard, category: catBoard, myRank, loading } = useLeaderboard(activeCategory);
   const { user } = useSelector((s) => s.auth);
-  const leaderboardData = activeCategory ? catBoard : globalBoard;
+  const leaderboardData = (activeCategory ? catBoard : globalBoard) || [];
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">

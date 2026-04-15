@@ -7,10 +7,12 @@
  * @returns {string}
  */
 export function formatScore(score) {
-  if (score >= 1_000_000) return `${(score / 1_000_000).toFixed(1)}M`;
-  if (score >= 10_000) return `${(score / 1_000).toFixed(1)}K`;
-  if (score >= 1_000) return score.toLocaleString();
-  return score?.toString() ?? '0';
+  const n = Number(score);
+  if (!Number.isFinite(n)) return '0';
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 10_000) return `${(n / 1_000).toFixed(1)}K`;
+  if (n >= 1_000) return n.toLocaleString();
+  return n.toString();
 }
 
 /**

@@ -1,8 +1,13 @@
 // src/api/axiosInstance.js
 import axios from 'axios';
 
+// In production (Vercel), requests go to /api which Vercel rewrites to Render backend.
+// In development, requests go to /api which Vite proxies to localhost:5001.
+// VITE_API_URL can override both if set explicitly in .env.production.
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 const axiosInstance = axios.create({
-  baseURL: '/api',
+  baseURL: BASE_URL,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
   timeout: 15000,
@@ -31,6 +36,9 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    // If config is missing (network error, timeout) bail early
+    if (!originalRequest) return Promise.reject(error);
+
     const url = originalRequest.url || '';
 
     const shouldSkipRefresh =

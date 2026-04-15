@@ -21,16 +21,21 @@ import redisClient from '../config/redis.js';
  * Helps prevent XSS attacks by making tokens inaccessible to JavaScript.
  */
 function setTokenCookies(res, accessToken, refreshToken) {
-  res.cookie('accessToken', accessToken, {
+  const isProduction = env.NODE_ENV === 'production';
+  const cookieDefaults = {
     httpOnly: true,
-    secure: env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: isProduction,
+    // 'none' required for cross-origin (Vercel frontend → Render backend).
+    // 'lax' would block cookies in cross-origin requests entirely.
+    sameSite: isProduction ? 'none' : 'lax',
+  };
+
+  res.cookie('accessToken', accessToken, {
+    ...cookieDefaults,
     maxAge: 15 * 60 * 1000,
   });
   res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    secure: env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    ...cookieDefaults,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: '/api/auth/refresh',
   });
@@ -109,8 +114,10 @@ export async function logout(req, res, next) {
     if (req.user) {
       await User.findByIdAndUpdate(req.user._id, { $unset: { refreshToken: 1 } });
     }
-    res.clearCookie('accessToken');
-    res.clearCookie('refreshToken', { path: '/api/auth/refresh' });
+    const isProduction = env.NODE_ENV === 'production';
+    const cookieOpts = { httpOnly: true, secure: isProduction, sameSite: isProduction ? 'none' : 'lax' };
+    res.clearCookie('accessToken', cookieOpts);
+    res.clearCookie('refreshToken', { ...cookieOpts, path: '/api/auth/refresh' });
     sendSuccess(res, { message: 'Logged out successfully' });
   } catch (err) {
     next(err);

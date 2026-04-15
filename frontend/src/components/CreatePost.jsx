@@ -1,6 +1,6 @@
 // src/components/CreatePost.jsx
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { createPostApi } from '../api/posts.js';
 import { prependPost } from '../store/feedSlice.js';
 
@@ -16,6 +16,7 @@ const CATEGORY_PLACEHOLDERS = {
 
 export function CreatePost({ onSuccess }) {
   const dispatch = useDispatch();
+  const authUser = useSelector((s) => s.auth.user);
   const [content, setContent] = useState('');
   const [category, setCategory] = useState('tech');
   const [loading, setLoading] = useState(false);
@@ -30,7 +31,14 @@ export function CreatePost({ onSuccess }) {
 
     try {
       const post = await createPostApi({ content, category });
-      dispatch(prependPost(post));
+      // Backend returns raw post (no populated authorId).
+      // Manually attach the current user so PostCard doesn't crash.
+      const enrichedPost = {
+        ...post,
+        authorId: post.authorId ?? authUser,
+        engagements: post.engagements ?? { likes: 0, comments: 0, shares: 0, bookmarks: 0 },
+      };
+      dispatch(prependPost(enrichedPost));
       setContent('');
       setExpanded(false);
       onSuccess?.();
