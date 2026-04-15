@@ -35,16 +35,21 @@ validateEnv();
 const app = express();
 const httpServer = createServer(app);
 
-// Support comma-separated origins e.g. "https://auragram.vercel.app,http://localhost:5173"
-const allowedOrigins = env.CLIENT_ORIGIN
-  .split(',')
-  .map((o) => o.trim())
-  .filter(Boolean);
+// Parse allowed origins from env — supports comma-separated list.
+// The Vercel production URL is always included regardless of what CLIENT_ORIGIN is set to,
+// so no manual Render dashboard change is required.
+const VERCEL_ORIGIN = 'https://auragram-nu.vercel.app';
+
+const allowedOrigins = [
+  ...env.CLIENT_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean),
+  VERCEL_ORIGIN,
+].filter((v, i, a) => a.indexOf(v) === i); // dedupe
 
 const corsOriginFn = (origin, callback) => {
-  // Allow requests with no origin (curl, same-origin, health checks)
+  // Allow requests with no origin (server-to-server, curl, health checks)
   if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-  callback(new Error(`CORS: origin ${origin} not allowed`));
+  // Return a proper 403 — not a thrown error — to avoid 500 responses
+  callback(null, false);
 };
 
 // Socket.io
