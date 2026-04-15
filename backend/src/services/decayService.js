@@ -17,8 +17,8 @@ export async function runDecay() {
   const decayDate = new Date();
   decayDate.setHours(0, 0, 0, 0); // beginning of today
 
-  // Only decay users who haven't been active recently
-  const sevenDaysAgo = new Date(Date.now() - 7 * 86400000);
+  // Only decay users inactive for more than 1 day
+  const oneDayAgo = new Date(Date.now() - 1 * 86400000);
 
   let processed = 0;
   let decayed = 0;
@@ -30,7 +30,7 @@ export async function runDecay() {
 
     while (true) {
       const query = {
-        lastActiveAt: { $lt: sevenDaysAgo },
+        lastActiveAt: { $lt: oneDayAgo },
         auraScore: { $gt: 0 },
       };
       if (lastId) query._id = { $gt: lastId };

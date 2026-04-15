@@ -45,8 +45,9 @@ function qualityMultiplier(post) {
 export function decayScore(user) {
   if (!user.lastActiveAt) return user.auraScore;
   const days = Math.floor((Date.now() - new Date(user.lastActiveAt).getTime()) / 86400000);
-  if (days <= 7) return user.auraScore;
-  return Math.max(0, Math.floor(user.auraScore * Math.pow(0.98, days - 7)));
+  // Grace period: 1 day. After that, decay at 0.5% per day (very gradual).
+  if (days <= 1) return user.auraScore;
+  return Math.max(0, Math.floor(user.auraScore * Math.pow(0.995, days - 1)));
 }
 
 /**
