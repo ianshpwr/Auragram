@@ -53,7 +53,7 @@ export function initSocket(ioInstance) {
     socket.join(`user:${userId}`);
 
     // Handle leaderboard room join/leave
-    socket.on('join_leaderboard', () => {
+    socket.on('join_leaderboard', () => {                  //<------- observer
       socket.join('leaderboard-updates');
       console.log(`[Socket] User ${userId} joined leaderboard room`);
     });
