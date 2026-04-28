@@ -23,7 +23,7 @@ import NotificationPanel from './components/NotificationPanel.jsx';
 /**
  * Protected route wrapper — redirects to /login if not authenticated
  */
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children }) {         //<------ composite and template 
   const { user, initialized } = useSelector((s) => s.auth);
   if (!initialized) return <LoadingScreen />;
   if (!user) return <Navigate to="/login" replace />;
