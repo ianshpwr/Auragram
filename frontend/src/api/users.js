@@ -6,7 +6,7 @@ export const getUserApi = async (id) => {
   return data.data;
 };
 
-export const getUserPostsApi = async (id, { cursor, limit = 20 } = {}) => {
+export const getUserPostsApi = async (id, { cursor, limit = 20 } = {}) => {     //<------ adapter
   const params = { limit };
   if (cursor) params.cursor = cursor;
   const { data } = await axiosInstance.get(`/users/${id}/posts`, { params });
