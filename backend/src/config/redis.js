@@ -32,7 +32,7 @@ function createRedisClient() {
 }
 
 // Singleton client
-redisClient = createRedisClient();
+redisClient = createRedisClient();              // <---- singleton 
 
 // Export connection config for BullMQ (separate connection)
 export const bullMQConnection = {
