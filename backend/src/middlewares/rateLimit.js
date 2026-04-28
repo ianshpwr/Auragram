@@ -11,7 +11,7 @@ import { sendError } from '../utils/helpers.js';
  * @param {number} options.windowSecs - Window size in seconds
  * @param {string} [options.keyPrefix] - Redis key prefix
  */
-export function createRateLimiter({ max = 100, windowSecs = 900, keyPrefix = 'api' }) {
+export function createRateLimiter({ max = 100, windowSecs = 900, keyPrefix = 'api' }) {     //<------ Factory 
   // In development, skip rate limiting entirely
   if (process.env.NODE_ENV === 'development') {
     return (_req, _res, next) => next();
